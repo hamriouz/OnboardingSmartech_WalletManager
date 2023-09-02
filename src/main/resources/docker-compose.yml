@@ -1,0 +1,127 @@
+version: '3.1'
+
+services:
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: adverge_password
+      POSTGRES_USER: adverge_user
+      POSTGRES_DB: adverge
+
+  #  pgadmin:
+  #    container_name: pgadmin
+  #    image: dpage/pgadmin4:latest
+  #    environment:
+  #      - PGADMIN_DEFAULT_EMAIL=erfan@smartech.ir
+  #      - PGADMIN_DEFAULT_PASSWORD=changeit
+  #    depends_on:
+  #      - postgres
+  #    ports:
+  #      - "5050:8091"
+  #    restart: always
+
+  redis:
+    image: redis:7.0-rc1-bullseye
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+
+  elasticsearch:
+    container_name: es-container
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+      - cluster.max_shards_per_node=2000
+      - ES_JAVA_OPTS=-Xmx2g
+      - ELASTIC_PASSWORD=elastic_password
+    ports:
+      - 9200:9200
+    networks:
+      - es-net
+    volumes:
+      - './var/elasticsearch/data:/usr/share/elasticsearch/data'
+
+  kibana:
+    container_name: kb-container
+    image: docker.elastic.co/kibana/kibana:7.13.4
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es-container:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=elastic_password
+    networks:
+      - es-net
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: '-Xms1g -Xmx1g'
+      KAFKA_JMX_HOSTNAME: 127.0.0.1
+      KAFKA_JMX_PORT: 10030
+      LOG_DIR: /var/log/kafka
+      KAFKA_DATA_DIR: /var/lib/kafka
+
+
+#  kafka-ui:
+#    image: provectuslabs/kafka-ui:0.3.3
+#    depends_on:
+#      - kafka
+#    ports:
+#      - 3030:8080
+#    environment:
+#      KAFKA_CLUSTERS_0_NAME: local
+#      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 127.0.0.1:9092
+#      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+
+networks:
+  es-net:
+    driver: bridge
+
+volumes:
+  db-data:
+  cache:
+    driver: local
