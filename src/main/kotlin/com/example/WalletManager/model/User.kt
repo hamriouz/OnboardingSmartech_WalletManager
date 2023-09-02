@@ -1,9 +1,7 @@
 package com.example.WalletManager.model
 
-import net.bytebuddy.dynamic.loading.InjectionClassLoader.Strategy
 import javax.persistence.*
-import java.lang.annotation.*;
-import java.lang.reflect.Constructor
+
 @Entity
 @Table(name = "users")
 class User() {

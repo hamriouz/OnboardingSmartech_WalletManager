@@ -2,7 +2,6 @@ package com.example.WalletManager
 
 
 import com.example.WalletManager.model.Transaction
-import com.example.WalletManager.model.User
 import com.example.WalletManager.model.SetOrChangeName
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
