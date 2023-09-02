@@ -13,7 +13,7 @@ class User() {
     @GeneratedValue
     var id: Int? = null
 
-    @Column(name = "owner_name")
+    @Column(name = "owner_name", nullable = false)
     var ownerName: String? = null
 
 }
