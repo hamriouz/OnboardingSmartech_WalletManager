@@ -1,6 +1,7 @@
 package com.example.WalletManager
 
 
+import com.example.WalletManager.model.FullUser
 import com.example.WalletManager.model.Transaction
 import com.example.WalletManager.model.SetOrChangeName
 import org.springframework.http.HttpStatus
@@ -19,13 +20,11 @@ import java.util.*
 @RequestMapping("/api/Wallet/User")
 interface UserService {
     @GetMapping("/{id}")
-//    fun getUserById(@PathVariable id: Int): Optional<User>
-    fun getUserById(@PathVariable id: Int): Optional<User>
+    fun getUserById(@PathVariable id: Int): FullUser
 
     @PostMapping("/Create")
     @ResponseStatus(HttpStatus.CREATED)
     fun createNewUser(@RequestBody userName: SetOrChangeName ): String
-//    fun createNewUser(@RequestBody userName: SetOrChangeName ): Optional<User>
 
     @PutMapping("/Transaction")
     @ResponseStatus(HttpStatus.OK)
