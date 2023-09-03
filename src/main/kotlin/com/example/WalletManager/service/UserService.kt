@@ -5,14 +5,7 @@ import com.example.WalletManager.model.FullUser
 import com.example.WalletManager.model.Transaction
 import com.example.WalletManager.model.SetOrChangeName
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
 
@@ -28,7 +21,7 @@ interface UserService {
 
     @PutMapping("/Transaction")
     @ResponseStatus(HttpStatus.OK)
-    fun transaction(@RequestBody transaction: Transaction): Transaction = transaction
+    fun transaction(@RequestBody transaction: Transaction): String
 
     @PutMapping("/Rename/{id}")
     @ResponseStatus(HttpStatus.OK)
