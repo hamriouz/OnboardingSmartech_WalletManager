@@ -12,7 +12,7 @@ class KafkaConsumer(
     ) {
     @KafkaListener(topics = [AppConstants.TOPIC_NAME])
     fun listen(msg:String){
-        print("Message Received - $msg")
+        println("Message Received - $msg")
         val col = ":"
         val equal = "="
         val list = msg.split(col)
